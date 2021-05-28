@@ -1,0 +1,48 @@
+{
+  "name": "nodescrape",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^10.0.0",
+    "lodash": "^4.17.21",
+    "loglevel": "^1.7.1",
+    "retry-axios": "^2.4.0",
+    "typescript": "^4.3.2"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.76",
+    "@types/chai": "^4.2.18",
+    "@types/chai-as-promised": "^7.1.4",
+    "@types/lodash": "^4.14.170",
+    "@types/mocha": "^8.2.2",
+    "@types/sinon": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "aws-sdk": "^2.917.0",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "concurrently": "^6.2.0",
+    "cpx": "^1.2.1",
+    "eslint": "^7.27.0",
+    "mocha": "^8.4.0",
+    "prettier": "^2.3.0",
+    "rimraf": "^3.0.2",
+    "sinon": "^11.1.1"
+  },
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "build": "tsc && yarn run copy-dependencies",
+    "build-watch": "yarn run build && cpx ./.env ./dist && tsc -w --preserveWatchOutput true",
+    "copy-dependencies": "cpx ./package.json ./dist && cpx ./package-lock.json ./dist && cd ./dist && yarn install --production",
+    "start": "concurrently --kill-others --kill-others-on-fail \"yarn run build-watch\" \"docker pull lambci/lambda:nodejs12.x && sam local start-api -p 3001 --skip-pull-image --template ./template.yaml\"",
+    "test": "mocha --require ts-node/register ./src/**/*.spec.ts",
+    "lint": "eslint --ext .ts src/ && prettier --check src/",
+    "lint:fix": "eslint --ext .ts src/ && prettier --write src/",
+    "deploy": "yarn clean && yarn build && bash ./.ci/deploy.sh prod"
+  },
+  "author": "",
+  "license": "ISC",
+  "private": true
+}

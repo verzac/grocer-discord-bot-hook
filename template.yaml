@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Webhook proxy for GroceryBot
+
+# Parameters:
+#   AllowOrigin:
+#     Type: String
+#     Default: "'*'"
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+    # Environment:
+    #   Variables:
+    #     # LOG_LEVEL: !Ref LogLevel
+  # Api:
+  #   Cors:
+  #     AllowMethods: "'*'"
+  #     AllowOrigin: !Ref AllowOrigin
+  #     AllowHeaders: "'*'"
+
+Resources:
+  ProxyDiscordWebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: index.handleProxy
+      Runtime: nodejs14.x
+      Events:
+        GetNewsSourcesApi:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: post
+
+Outputs:
+  BaseUrl:
+    Description: "The base URL of the service."
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
